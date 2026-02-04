@@ -29,7 +29,7 @@ Create a `.env` file in `backend/`:
 
 ```
 PORT=5000
-MONGODB_URI=mongodb+srv://rithika:YG7C9mtpMThUHvUP@cluster0.l7zhskx.mongodb.net/tailor_db
+MONGODB_URI=mongodb+srv://
 ```
 
 Start the API:
