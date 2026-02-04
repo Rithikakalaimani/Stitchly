@@ -84,6 +84,15 @@ The app is set up for a single Vercel project: static frontend + API (Express in
 
 The frontend uses relative `/api` requests, so no extra env vars are needed for the client. For local development, keep using the backend and frontend as in **Setup** above.
 
+## Use as a mobile app (Add to Home Screen)
+
+Stitchly is set up as a **Progressive Web App (PWA)**. After deploying, you can install it on your phone so it appears as an icon like other apps and opens in fullscreen.
+
+- **Android (Chrome):** Open your Vercel URL in Chrome → menu (⋮) → **“Add to Home screen”** or **“Install app”**.
+- **iPhone/iPad (Safari):** Open your Vercel URL in Safari → tap the **Share** button → **“Add to Home Screen”**.
+
+The app will use the Stitchly icon and open without the browser address bar when launched from the home screen.
+
 ## API overview
 
 | Method | Path | Description |
