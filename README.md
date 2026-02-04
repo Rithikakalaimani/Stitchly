@@ -2,6 +2,8 @@
 
 A full-stack app for tailors to manage customers, orders, billing, and design galleries. Built with React and Node.js.
 
+Demo Link :[https://stitchly-silk.vercel.app/](https://stitchly-silk.vercel.app/)
+
 ## Features
 
 - **Customers**
