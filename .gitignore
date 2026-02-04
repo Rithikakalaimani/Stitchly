@@ -9,6 +9,7 @@ node_modules/
 # Build output
 frontend/dist/
 backend/dist/
+.vercel/
 
 # Logs
 *.log

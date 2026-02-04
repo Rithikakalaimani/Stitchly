@@ -67,6 +67,23 @@ npm run dev
 
 App runs at **http://localhost:3000** and proxies `/api` to the backend.
 
+## Deploy to Vercel
+
+The app is set up for a single Vercel project: static frontend + API (Express in a serverless function).
+
+1. **Push your repo** to GitHub/GitLab/Bitbucket and [import the project in Vercel](https://vercel.com/new).
+
+2. **Environment variable**  
+   In the Vercel project → **Settings → Environment Variables**, add:
+   - `MONGODB_URI` = your MongoDB connection string (e.g. [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) URI).
+
+3. **Deploy**  
+   Vercel will:
+   - Install root dependencies (for the API) and build the frontend (`frontend/dist`).
+   - Serve the frontend and route `/api/*` to the serverless function in `api/index.js`.
+
+The frontend uses relative `/api` requests, so no extra env vars are needed for the client. For local development, keep using the backend and frontend as in **Setup** above.
+
 ## API overview
 
 | Method | Path | Description |
