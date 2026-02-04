@@ -12,7 +12,7 @@ async function request(path, options = {}) {
 
 export const api = {
   customers: {
-    list: () => request('/customers'),
+    list: (params) => request('/customers' + (params ? '?' + new URLSearchParams(params).toString() : '')),
     get: (id) => request(`/customers/${id}`),
     getOverview: (id) => request(`/customers/${id}/overview`),
     create: (body) => request('/customers', { method: 'POST', body: JSON.stringify(body) }),
@@ -40,5 +40,11 @@ export const api = {
   garments: {
     update: (id, body) => request(`/garments/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
     delete: (id) => request(`/garments/${id}`, { method: 'DELETE' }),
+  },
+  designs: {
+    list: () => request('/designs'),
+    get: (id) => request(`/designs/${id}`),
+    create: (body) => request('/designs', { method: 'POST', body: JSON.stringify(body) }),
+    delete: (id) => request(`/designs/${id}`, { method: 'DELETE' }),
   },
 };

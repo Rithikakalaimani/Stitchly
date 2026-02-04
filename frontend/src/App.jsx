@@ -5,6 +5,7 @@ import Customers from './pages/Customers';
 import OrderDetail from './pages/OrderDetail';
 import NewOrder from './pages/NewOrder';
 import CustomerDetail from './pages/CustomerDetail';
+import Designs from './pages/Designs';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/orders" element={<Customers />} />
         <Route path="/orders/new" element={<NewOrder />} />
         <Route path="/orders/:orderId" element={<OrderDetail />} />
+        <Route path="/designs" element={<Designs />} />
       </Routes>
     </Layout>
   );

@@ -7,9 +7,30 @@ const Payment = require('../models/Payment');
 const DeliveryItem = require('../models/DeliveryItem');
 const { genId } = require('../utils/ids');
 
+const DEFAULT_LIMIT = 30;
+const MAX_LIMIT = 100;
+const SEARCH_LIMIT = 50;
+
 router.get('/', async (req, res) => {
   try {
-    const customers = await Customer.find().sort({ createdAt: -1 });
+    const limit = Math.min(parseInt(req.query.limit, 10) || DEFAULT_LIMIT, MAX_LIMIT);
+    const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+
+    let query = {};
+    if (search.length > 0) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escaped, 'i');
+      query = { $or: [{ name: regex }, { phone: regex }] };
+    }
+
+    const searchLimit = search.length > 0 ? Math.min(limit, SEARCH_LIMIT) : limit;
+    const customers = await Customer.find(query)
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(searchLimit)
+      .lean();
+
     res.json(customers);
   } catch (err) {
     res.status(500).json({ error: err.message });

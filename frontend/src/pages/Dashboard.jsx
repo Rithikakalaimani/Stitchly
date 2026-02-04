@@ -14,31 +14,52 @@ const PERIOD_OPTIONS = [
   { value: 'all', label: 'All time' },
 ];
 
+const PENDING_PAGE_SIZE = 20;
+
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [period, setPeriod] = useState('all');
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     api.dashboard
-      .get({ period })
-      .then(setData)
+      .get({ period, limit: PENDING_PAGE_SIZE, offset: 0 })
+      .then((res) => {
+        setData(res);
+        setPendingOrders(res.pending_orders || []);
+        setPendingOrdersCount(res.pending_orders_count ?? 0);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [period]);
+
+  const loadMorePending = () => {
+    if (loadingMore || pendingOrders.length >= pendingOrdersCount) return;
+    setLoadingMore(true);
+    api.dashboard
+      .get({ period, limit: PENDING_PAGE_SIZE, offset: pendingOrders.length })
+      .then((res) => {
+        setPendingOrders((prev) => [...prev, ...(res.pending_orders || [])]);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoadingMore(false));
+  };
 
   if (loading && !data) return <div className="page-loading">Loading dashboard…</div>;
   if (error && !data) return <div className="page-error">Error: {error}</div>;
 
   const d = data || {};
-  const pendingOrdersCount = d.pending_orders_count ?? 0;
   const totalPendingMoney = d.total_pending_money ?? 0;
   const totalEstimatedMoney = d.total_estimated_money ?? 0;
   const totalPaid = d.total_paid ?? 0;
   const periodLabel = PERIOD_OPTIONS.find((p) => p.value === (d.period || period))?.label || 'All time';
-  const pendingOrders = d.pending_orders || [];
+  const hasMorePending = pendingOrders.length < pendingOrdersCount;
 
   return (
     <div className="dashboard">
@@ -79,41 +100,55 @@ export default function Dashboard() {
 
       <section className="dashboard-section pending-orders-section">
         <h2 className="dashboard-section-title">Pending orders</h2>
-        {pendingOrders.length === 0 ? (
+        {pendingOrders.length === 0 && !loading ? (
           <p className="dashboard-muted">No pending orders.</p>
         ) : (
-          <div className="dashboard-table-wrap">
-            <table className="dashboard-table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Type of dress</th>
-                  <th>Price</th>
-                  <th>Order status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingOrders.map((o) => (
-                  <tr key={o.order_id}>
-                    <td>
-                      <Link to={`/customers/${o.customer_id}`} className="dashboard-customer-link">
-                        {o.customer_name}
-                      </Link>
-                    </td>
-                    <td>{o.type_of_dress}</td>
-                    <td>₹{formatMoney(o.price)}</td>
-                    <td>
-                      <span className="dashboard-status-badge dashboard-status-open">{o.order_status}</span>
-                    </td>
-                    <td>
-                      <Link to={`/customers/${o.customer_id}`} className="btn btn-sm">View</Link>
-                    </td>
+          <>
+            <div className="dashboard-table-wrap">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Type of dress</th>
+                    <th>Price</th>
+                    <th>Order status</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {pendingOrders.map((o) => (
+                    <tr key={o.order_id}>
+                      <td>
+                        <Link to={`/customers/${o.customer_id}`} className="dashboard-customer-link">
+                          {o.customer_name}
+                        </Link>
+                      </td>
+                      <td>{o.type_of_dress}</td>
+                      <td>₹{formatMoney(o.price)}</td>
+                      <td>
+                        <span className="dashboard-status-badge dashboard-status-open">{o.order_status}</span>
+                      </td>
+                      <td>
+                        <Link to={`/customers/${o.customer_id}`} className="btn btn-sm">View</Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {hasMorePending && (
+              <div className="dashboard-load-more-wrap">
+                <button
+                  type="button"
+                  className="btn btn-outline dashboard-load-more-btn"
+                  onClick={loadMorePending}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? 'Loading…' : 'Load more pending orders'}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

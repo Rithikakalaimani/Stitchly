@@ -1,0 +1,358 @@
+.designs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.designs-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.designs-intro {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.btn-add-design {
+  align-self: flex-start;
+  min-height: 44px;
+}
+
+.designs-add-form {
+  max-width: 560px;
+}
+
+.designs-add-form h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.designs-add-form .form-row {
+  margin-bottom: 1rem;
+}
+
+.designs-add-form .form-row label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.designs-add-form .form-row input[type="text"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.designs-add-form .images-row .design-image-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.design-slot {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.design-slot .photo-input-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.design-slot-empty {
+  height: 140px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.btn-slot-take {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--bg);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-slot-take:hover {
+  background: var(--accent-dim);
+}
+
+.btn-slot-add {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.btn-slot-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.design-slot-preview {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.design-slot-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.design-slot-remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.design-slot-remove:hover {
+  background: var(--danger);
+}
+
+.designs-add-form .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.designs-add-form .form-actions .btn {
+  min-width: 120px;
+  min-height: 44px;
+}
+
+.designs-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.designs-empty p {
+  margin: 0;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.designs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.design-card {
+  position: relative;
+  padding: 1rem;
+  padding-top: 2rem;
+}
+
+.design-card-header {
+  margin-bottom: 0.75rem;
+}
+
+.design-card-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.design-card-type {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.design-card-images {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-height: 80px;
+}
+
+.design-card-thumb {
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.design-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.design-card-thumb:hover {
+  opacity: 0.9;
+}
+
+.design-card-delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.design-card-delete:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.design-card-delete:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.design-delete-icon {
+  font-size: 1.25rem;
+}
+
+/* Photo zoom (same as CustomerDetail) */
+.designs-page .photo-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.designs-page .photo-zoom-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.designs-page .photo-zoom-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.designs-page .photo-zoom-close:hover {
+  background: var(--danger);
+  color: var(--bg);
+  border-color: var(--danger);
+}
+
+.designs-page .photo-zoom-close-icon {
+  font-size: 1.5rem;
+}
+
+.designs-page .photo-zoom-image {
+  max-width: 100%;
+  max-height: calc(90vh - 3rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+  .designs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .design-image-slots {
+    flex-direction: column;
+  }
+
+  .design-slot {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .design-slot-empty {
+    width: 100%;
+    max-width: 200px;
+    height: 120px;
+  }
+
+  .design-slot-preview {
+    width: 100%;
+    max-width: 200px;
+    height: 120px;
+  }
+}

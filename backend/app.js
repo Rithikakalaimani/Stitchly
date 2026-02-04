@@ -7,6 +7,7 @@ const deliveryRoutes = require('./routes/deliveries');
 const paymentRoutes = require('./routes/payments');
 const dashboardRoutes = require('./routes/dashboard');
 const garmentRoutes = require('./routes/garments');
+const designRoutes = require('./routes/designs');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/garments', garmentRoutes);
+app.use('/api/designs', designRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

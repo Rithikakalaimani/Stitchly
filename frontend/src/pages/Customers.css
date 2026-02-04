@@ -12,6 +12,17 @@
   min-width: 0;
 }
 
+.load-more-wrap {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.load-more-btn {
+  min-width: 180px;
+  min-height: 44px;
+}
+
 /* Header row: title, actions, search - all vertically aligned in one line */
 .customers .page-header {
   display: flex;

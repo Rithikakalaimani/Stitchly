@@ -43,11 +43,21 @@ function getDateRange(period) {
   return { start, end };
 }
 
+const PENDING_LIMIT_DEFAULT = 30;
+const PENDING_LIMIT_MAX = 100;
+
 // Dashboard: pending orders, total pending money, total estimated, total paid (with period filter)
 router.get('/', async (req, res) => {
   try {
     const period = req.query.period || 'all';
-    const openOrders = await Order.find({ status: 'OPEN' }).sort({ order_date: -1 });
+    const pendingLimit = Math.min(parseInt(req.query.limit, 10) || PENDING_LIMIT_DEFAULT, PENDING_LIMIT_MAX);
+    const pendingOffset = Math.max(0, parseInt(req.query.offset, 10) || 0);
+
+    const [pendingOrdersCount, openOrders] = await Promise.all([
+      Order.countDocuments({ status: 'OPEN' }),
+      Order.find({ status: 'OPEN' }).sort({ order_date: -1 }).skip(pendingOffset).limit(pendingLimit),
+    ]);
+
     const allOrders = await Order.find();
     const orderIds = allOrders.map((o) => o.order_id);
     const garments = await Garment.find({ order_id: { $in: orderIds } });
@@ -100,7 +110,7 @@ router.get('/', async (req, res) => {
     }
 
     res.json({
-      pending_orders_count: openOrders.length,
+      pending_orders_count: pendingOrdersCount,
       pending_orders,
       total_pending_money,
       total_estimated_money,

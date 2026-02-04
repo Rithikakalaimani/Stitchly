@@ -1,12 +1,12 @@
 # Stitchly
 
-A full-stack app for tailors to manage customers, orders, and billing. Built with React and Node.js.
+A full-stack app for tailors to manage customers, orders, billing, and design galleries. Built with React and Node.js.
 
 ## Features
 
 - **Customers**
-  - Add customers (name, phone). Edit name and phone from the customer page.
-  - Search customers by name or phone on the dashboard.
+  - Add customers (name, phone optional). Edit name and phone from the customer page. Delete a customer (and all their orders, garments, payments) from the customer page.
+  - **List**: Shows recent customers first; does not load all at once. Use **search** (name or phone) to find anyone, or **Load more customers** to fetch the next page.
   - **Import from contacts**: On supported mobile browsers (e.g. Android Chrome over HTTPS), add many customers at once or use “Use name & phone from contacts” in the Add customer form to fill from a single contact.
   - View a customer to see all their orders, garments, amounts, and payments in one place.
 
@@ -20,12 +20,15 @@ A full-stack app for tailors to manage customers, orders, and billing. Built wit
   - Record payments against a specific order or **Apply to balance (any order)** so the amount is allocated across open orders (FIFO).
   - **Share billing via WhatsApp**: send a formatted billing summary (items, total, due) to the customer or to any chat. On mobile, opens WhatsApp with the customer’s number if available.
 
+- **Design gallery**
+  - Add blouse or other designs with **1–3 photos** (different views) per design. Shown in a gallery; useful to show customers later. Delete or view full-size from the Designs page.
+
 - **Dashboard**
   - Pending orders count, total pending money, total estimated, and total paid (with a time-period filter for paid).
-  - Pending orders table with customer, type of dress, price, status, and View link. Optimized for mobile (no horizontal scroll).
+  - Pending orders table with customer, type of dress, price, status, and View link. Only the first page is loaded; use **Load more pending orders** when there are many. Optimized for mobile (no horizontal scroll).
 
 - **Mobile**
-  - Layout and touch targets are tuned for small screens. Customer page, order details, and dashboard work on phones.
+  - Layout and touch targets are tuned for small screens. **Header menu** (hamburger) on small screens opens a slide-out with Dashboard, Customers, and Designs. Customer page, order details, and dashboard work on phones.
 
 ## Tech stack
 
@@ -97,10 +100,11 @@ The app will use the Stitchly icon and open without the browser address bar when
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | /api/customers | List customers |
+| GET | /api/customers | List customers (?limit, ?offset, ?search for pagination and search) |
 | POST | /api/customers | Create customer |
 | GET | /api/customers/:id | Get one customer |
 | PATCH | /api/customers/:id | Update customer (name, phone) |
+| DELETE | /api/customers/:id | Delete customer and all related orders, garments, payments |
 | GET | /api/customers/:id/overview | Customer + orders, garments, payments, summary |
 | DELETE | /api/customers/:id/garments | Delete all garments for this customer (clear all order details) |
 | GET | /api/orders | List orders (?customer_id, ?status) |
@@ -111,8 +115,12 @@ The app will use the Stitchly icon and open without the browser address bar when
 | GET | /api/payments | List payments (?order_id) |
 | POST | /api/payments | Record payment (order_id, amount_paid, mode) |
 | POST | /api/payments/apply-to-balance | Apply payment to customer balance (customer_id, amount_paid, mode); allocates FIFO across open orders |
-| GET | /api/dashboard | Dashboard summary (?period for paid filter) |
+| GET | /api/dashboard | Dashboard summary (?period, ?limit, ?offset for pending orders pagination) |
 | GET | /api/dashboard/analytics | Per-customer analytics |
+| GET | /api/designs | List design gallery entries |
+| POST | /api/designs | Create design (name, type, images[1–3]) |
+| GET | /api/designs/:id | Get one design |
+| DELETE | /api/designs/:id | Delete design |
 
 ## Data model (main)
 
@@ -120,5 +128,6 @@ The app will use the Stitchly icon and open without the browser address bar when
 - **Order**: order_id, customer_id, order_date, total_estimated_amount, status (OPEN | COMPLETED)
 - **Garment**: garment_id, order_id, type, quantity, price_per_piece, status (PENDING | STITCHED | DELIVERED), quantity_delivered, image (optional base64)
 - **Payment**: payment_id, order_id, amount_paid, payment_date, mode (cash | UPI)
+- **Design**: design_id, name, type, images (array of 1–3 base64 URLs for design gallery)
 
 Order is set to COMPLETED when all its garments are DELIVERED. Due = total estimated − total paid per order; remaining is summed across orders for the customer.

@@ -272,6 +272,17 @@
   color: var(--warning);
 }
 
+.dashboard-load-more-wrap {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-load-more-btn {
+  min-width: 180px;
+  min-height: 44px;
+}
+
 .tabs {
   display: flex;
   gap: 0.5rem;

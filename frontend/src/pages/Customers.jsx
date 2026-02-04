@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import './Customers.css';
 
 const CONTACTS_API_SUPPORTED = typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
+const RECENT_LIMIT = 30;
+const SEARCH_DEBOUNCE_MS = 350;
 
 export default function Customers() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '' });
@@ -15,26 +19,78 @@ export default function Customers() {
   const [importingContacts, setImportingContacts] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
-  const load = () => api.customers.list().then(setList).catch((e) => setError(e.message));
-
-  const filteredList = searchQuery.trim()
-    ? list.filter((c) => {
-        const q = searchQuery.trim().toLowerCase();
-        const name = (c.name || '').toLowerCase();
-        const phone = (c.phone || '').toLowerCase();
-        return name.includes(q) || phone.includes(q);
+  const loadRecent = useCallback((offset = 0, append = false) => {
+    const limit = RECENT_LIMIT;
+    return api.customers
+      .list({ limit, offset })
+      .then((data) => {
+        if (append) {
+          setList((prev) => (offset === 0 ? data : [...prev, ...data]));
+        } else {
+          setList(data);
+        }
+        setHasMore(data.length === limit);
+        return data;
       })
-    : list;
+      .catch((e) => {
+        setError(e.message);
+        throw e;
+      });
+  }, []);
+
+  const loadSearch = useCallback((q) => {
+    if (!q.trim()) {
+      return loadRecent(0, false).then(() => {});
+    }
+    return api.customers
+      .list({ search: q.trim(), limit: 50 })
+      .then((data) => {
+        setList(data);
+        setHasMore(false);
+      })
+      .catch((e) => setError(e.message));
+  }, [loadRecent]);
+
+  const initialized = useRef(false);
 
   useEffect(() => {
-    load().finally(() => setLoading(false));
-  }, []);
+    setError(null);
+    loadRecent(0, false).finally(() => {
+      setLoading(false);
+      initialized.current = true;
+    });
+  }, [loadRecent]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      if (initialized.current) {
+        setLoading(true);
+        setError(null);
+        loadRecent(0, false).finally(() => setLoading(false));
+      }
+      return;
+    }
+    const t = setTimeout(() => {
+      setLoading(true);
+      setError(null);
+      loadSearch(searchQuery).finally(() => setLoading(false));
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [searchQuery, loadSearch, loadRecent]);
 
   useEffect(() => {
     if (!importMessage) return;
     const t = setTimeout(() => setImportMessage(null), 5000);
     return () => clearTimeout(t);
   }, [importMessage]);
+
+  const loadMore = () => {
+    if (loadingMore || !hasMore || searchQuery.trim()) return;
+    setLoadingMore(true);
+    loadRecent(list.length, true)
+      .catch(() => {})
+      .finally(() => setLoadingMore(false));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +101,8 @@ export default function Customers() {
       .then(() => {
         setForm({ name: '', phone: '' });
         setShowForm(false);
-        load();
+        setError(null);
+        loadRecent(0, false);
       })
       .catch((e) => setError(e.message));
   };
@@ -106,7 +163,7 @@ export default function Customers() {
           skipped++;
         }
       }
-      await load();
+      await loadRecent(0, false);
       setImportMessage(added > 0 ? `Added ${added} customer${added !== 1 ? 's' : ''}. They appear in the list below.${skipped > 0 ? ` ${skipped} skipped (already exist or no name).` : ''}` : 'No new customers added. Select contacts with a name.');
     } catch (err) {
       if (err.name !== 'SecurityError' && err.name !== 'InvalidStateError') {
@@ -208,16 +265,14 @@ export default function Customers() {
                 </tr>
               </thead>
               <tbody>
-                {list.length === 0 ? (
+                {list.length === 0 && !loading ? (
                   <tr>
-                    <td colSpan={3} className="muted">No customers yet. Add one above.</td>
-                  </tr>
-                ) : filteredList.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="muted">No customers match your search.</td>
+                    <td colSpan={3} className="muted">
+                      {searchQuery.trim() ? 'No customers match your search.' : 'No customers yet. Add one above.'}
+                    </td>
                   </tr>
                 ) : (
-                  filteredList.map((c) => (
+                  list.map((c) => (
                 <tr key={c.customer_id}>
                   <td>
                     <Link to={`/customers/${c.customer_id}`} className="customer-name-link">
@@ -239,6 +294,18 @@ export default function Customers() {
               </tbody>
             </table>
           </div>
+          {hasMore && !searchQuery.trim() && list.length > 0 && (
+            <div className="load-more-wrap">
+              <button
+                type="button"
+                className="btn btn-outline load-more-btn"
+                onClick={loadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? 'Loading…' : 'Load more customers'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
